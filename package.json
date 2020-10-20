@@ -1,9 +1,9 @@
 {
-  "name": "@ezDeFi/ez-sol-wallet-adapter",
+  "name": "@ezdefi/ezdefi-solala-wallet-adapter",
   "version": "0.1.0",
   "description": "Library to allow Solana dApps to use ezDeFi browser extension to sign transactions",
   "license": "Apache-2.0",
-  "repository": "ezDeFi/ez-sol-wallet-adapter",
+  "repository": "ezdefi/ezdefi-solana-wallet-adapter",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.js",
