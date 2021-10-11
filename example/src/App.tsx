@@ -23,25 +23,26 @@ function App(): React.ReactElement {
   const network = clusterApiUrl('devnet');
   const [providerUrl, setProviderUrl] = useState('https://www.sollet.io');
   const connection = useMemo(() => new Connection(network), [network]);
-  const urlWallet = useMemo(
-    () => new Wallet(providerUrl, network),
-    [providerUrl, network],
-  );
-  const injectedWallet = useMemo(() => {
-    try {
-      return new Wallet(
-        (window as unknown as { solana: unknown }).solana,
-        network,
-      );
-    } catch (e) {
-      console.log(`Could not create injected wallet`, e);
-      return null;
-    }
-  }, [network]);
-  const [selectedWallet, setSelectedWallet] = useState<
-    Wallet | undefined | null
+  const [selectedWalletType, setSelectedWalletType] = useState<
+    string | undefined | null
   >(undefined);
-  const [, setConnected] = useState(false);
+  const selectedWallet = useMemo(() => {
+    if (selectedWalletType == 'url') {
+      return new Wallet(providerUrl, network)
+    }
+    if (selectedWalletType == 'injected') {
+      try {
+        return new Wallet(
+          (window as unknown as { solana: unknown }).solana,
+          network,
+        );
+      } catch (e) {
+        console.log(`Could not create injected wallet`, e);
+        return null;
+      }
+    }
+  }, [providerUrl, network, selectedWalletType])
+  const [connected, setConnected] = useState(false);
   useEffect(() => {
     if (selectedWallet) {
       selectedWallet.on('connect', () => {
@@ -126,16 +127,19 @@ function App(): React.ReactElement {
           <div>Wallet address: {selectedWallet.publicKey?.toBase58()}.</div>
           <button onClick={sendTransaction}>Send Transaction</button>
           <button onClick={signMessage}>Sign Message</button>
-          <button onClick={() => selectedWallet.disconnect()}>
+          <button onClick={() => {
+            setConnected(false)
+            setSelectedWalletType(undefined)
+          }}>
             Disconnect
           </button>
         </div>
       ) : (
         <div>
-          <button onClick={() => setSelectedWallet(urlWallet)}>
+          <button onClick={() => setSelectedWalletType('url')}>
             Connect to Wallet
           </button>
-          <button onClick={() => setSelectedWallet(injectedWallet)}>
+          <button onClick={() => setSelectedWalletType('injected')}>
             Connect to Injected Wallet
           </button>
         </div>
